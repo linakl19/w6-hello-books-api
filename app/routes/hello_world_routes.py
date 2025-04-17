@@ -22,3 +22,17 @@ def say_hello_json():
         "message": "Hello!",
         "hobbies": ["Fishing", "Swimming", "Watching Reality Shows"]
     }
+
+# Debugging a broken endpoint
+@hello_world_bp.get("/broken-endpoint-with-broken-server-code")
+def broken_endpoint():
+    response_body = {
+        "name": "Ada Lovelace",
+        "message": "Hello!",
+        "hobbies": ["Fishing", "Swimming", "Watching Reality Shows"]
+    }
+    new_hobby = "Surfing"
+    # NEXT LINE CAUSED THE ERROR
+    # response_body["hobbies"] + new_hobby 
+    response_body["hobbies"].append(new_hobby)
+    return response_body
