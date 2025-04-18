@@ -1,4 +1,4 @@
-from flask import Blueprint
+from flask import Blueprint, abort, make_response
 from app.models.book import books
 
 books_bp = Blueprint("books_bp", __name__, url_prefix="/books")
@@ -19,16 +19,25 @@ def get_all_books():
 # Getting a single book endpoint
 @books_bp.get("/<book_id>")
 def gets_one_book(book_id):
+    book = validate_book(book_id)
+
+    return dict(
+        id = book.id,
+        title = book.title,
+        description = book.description,
+    )
+
+# Helper function to validate book_id
+def validate_book(book_id):
     try:
         book_id = int(book_id)
-    except ValueError:
-        return {"message": f"Book with id:{book_id} is invalid"}, 400
-    for book in books:
-        if book_id == book.id:
-            return dict(
-                id = book.id,
-                title = book.title,
-                description = book.description,
-            )
-    return {"message": f"Book with id: {book_id} was not found"}, 404
+    except:
+        response = {"message": f"Book with id:{book_id} is invalid"}
+        abort(make_response(response, 400))
 
+    for book in books:
+        if book.id == book_id:
+            return book
+        
+    response = {"message": f"Book with id:{book_id} was not found"}
+    abort(make_response(response, 404))
