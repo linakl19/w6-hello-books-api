@@ -19,7 +19,10 @@ def get_all_books():
 # Getting a single book endpoint
 @books_bp.get("/<book_id>")
 def gets_one_book(book_id):
-    book_id = int(book_id)
+    try:
+        book_id = int(book_id)
+    except ValueError:
+        return {"message": f"Book with id:{book_id} is invalid"}, 400
     for book in books:
         if book_id == book.id:
             return dict(
