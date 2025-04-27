@@ -43,6 +43,35 @@ def get_all_books():
         )
     return books_response
 
+# Getting a single book endpoint
+@books_bp.get("/<book_id>")
+def gets_one_book(book_id):
+    book = validate_book(book_id)
+
+    return {
+        "id": book.id,
+        "title": book.title,
+        "description": book.description,
+    }
+
+# Helper function to validate book_id
+def validate_book(book_id):
+    try:
+        book_id = int(book_id)
+    except:
+        response = {"message": f"Book with id:{book_id} is invalid"}
+        abort(make_response(response, 400))
+
+    query = db.select(Book).where(Book.id == book_id)
+    book = db.session.scalar(query)
+
+    if not book:
+        response = {"message": f"Book with id:{book_id} was not found"}
+        abort(make_response(response, 404))
+    
+    return book
+
+
 
 # from flask import Blueprint, abort, make_response
 # from app.models.book import books
