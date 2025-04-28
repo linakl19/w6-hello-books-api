@@ -1,4 +1,4 @@
-from flask import Blueprint, abort, make_response, request
+from flask import Blueprint, Response, abort, make_response, request
 from app.models.book import Book
 from ..db import db
 
@@ -53,6 +53,19 @@ def gets_one_book(book_id):
         "title": book.title,
         "description": book.description,
     }
+
+# Updates a single book endpoint
+@books_bp.put("/<book_id>")
+def update_book(book_id):
+    book = validate_book(book_id)
+    request_body = request.get_json()
+
+    book.title = request_body["title"]
+    book.description = request_body["description"]
+    db.session.commit()
+
+    return Response(status=204, mimetype="application/json")
+
 
 # Helper function to validate book_id
 def validate_book(book_id):
