@@ -27,7 +27,12 @@ def create_book():
 #Getting all books endpoint
 @books_bp.get("")
 def get_all_books():
-    query = db.select(Book).order_by(Book.id)
+    title_param = request.args.get("title")
+    if title_param:
+        query = db.select(Book).where(Book.title.ilike(f"%{title_param}%")).order_by(Book.id)
+    else:
+        query = db.select(Book).order_by(Book.id)
+    
     books = db.session.scalars(query)
     # We could also write the line above as:
     # books = db.session.execute(query).scalars()
