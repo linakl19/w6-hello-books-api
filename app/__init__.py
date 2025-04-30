@@ -2,14 +2,20 @@ from flask import Flask
 from .db import db, migrate
 from .models import book
 from .routes.book_routes import books_bp
+import os
 
-def create_app():
+def create_app(config=None):
     app = Flask(__name__)
 
     # 1. hide a warning about a feature in SQLAlchemy that we won't be using
     # 2. the connection string for our database
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:postgres@localhost:5432/hello_books_development'
+
+    if config:
+    # Merge `config` into the app's configuration
+    # to override the app's default settings
+        app.config.update(config)
 
     # Connects db and migrate to our Flask app
     db.init_app(app)
