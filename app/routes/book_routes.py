@@ -2,17 +2,23 @@ from flask import Blueprint, Response, abort, make_response, request
 from app.models.book import Book
 from ..db import db
 
+
 books_bp = Blueprint("books_bp", __name__, url_prefix="/books")
 
+
+# POST one
 @books_bp.post("")
 def create_book():
     # Handling the incomming data
     request_body = request.get_json()
-    title = request_body["title"]
-    description = request_body["description"]
 
-    # Creating and saving the new book
-    new_book = Book(title=title, description=description)
+    try:
+        new_book = Book.from_dict(request_body)
+
+    except KeyError as error:
+        response = {"message": f"Invalid request: missing {error.args[0]}"}
+        abort(make_response(response, 400))
+
     db.session.add(new_book)
     db.session.commit()
 
@@ -24,7 +30,8 @@ def create_book():
     }
     return response, 201
 
-#Getting all books endpoint
+
+#GET all
 @books_bp.get("")
 def get_all_books():
     # select all books
@@ -56,7 +63,8 @@ def get_all_books():
         )
     return books_response
 
-# Getting a single book endpoint
+
+# GET one
 @books_bp.get("/<book_id>")
 def gets_one_book(book_id):
     book = validate_book(book_id)
@@ -67,7 +75,8 @@ def gets_one_book(book_id):
         "description": book.description,
     }
 
-# Updates a single book endpoint
+
+# UPDATE one
 @books_bp.put("/<book_id>")
 def update_book(book_id):
     book = validate_book(book_id)
@@ -79,7 +88,8 @@ def update_book(book_id):
 
     return Response(status=204, mimetype="application/json")
 
-# Deletes a book endpoint
+
+# DELETE one
 @books_bp.delete("/<book_id>")
 def delete_book(book_id):
     book = validate_book(book_id)
