@@ -22,13 +22,7 @@ def create_book():
     db.session.add(new_book)
     db.session.commit()
 
-    # Returning a response
-    response = {
-        "id": new_book.id,
-        "title": new_book.title,
-        "description": new_book.description,
-    }
-    return response, 201
+    return new_book.to_dict(), 201
 
 
 #GET all
@@ -54,13 +48,7 @@ def get_all_books():
 
     books_response = []
     for book in books:
-        books_response.append(
-            {
-                "id": book.id,
-                "title": book.title,
-                "description": book.description
-            }
-        )
+        books_response.append(book.to_dict())
     return books_response
 
 
@@ -68,12 +56,7 @@ def get_all_books():
 @books_bp.get("/<book_id>")
 def gets_one_book(book_id):
     book = validate_book(book_id)
-
-    return {
-        "id": book.id,
-        "title": book.title,
-        "description": book.description,
-    }
+    return book.to_dict()
 
 
 # UPDATE one
@@ -104,14 +87,14 @@ def validate_book(book_id):
     try:
         book_id = int(book_id)
     except:
-        response = {"message": f"Book with id:{book_id} is invalid"}
+        response = {"message": f"Book {book_id} invalid"}
         abort(make_response(response, 400))
 
     query = db.select(Book).where(Book.id == book_id)
     book = db.session.scalar(query)
 
     if not book:
-        response = {"message": f"Book with id:{book_id} was not found"}
+        response = {"message": f"Book {book_id} not found"}
         abort(make_response(response, 404))
     
     return book
