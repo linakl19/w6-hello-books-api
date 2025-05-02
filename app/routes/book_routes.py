@@ -3,11 +3,11 @@ from app.models.book import Book
 from ..db import db
 
 
-books_bp = Blueprint("books_bp", __name__, url_prefix="/books")
+bp = Blueprint("bp", __name__, url_prefix="/books")
 
 
 # POST one
-@books_bp.post("")
+@bp.post("")
 def create_book():
     # Handling the incomming data
     request_body = request.get_json()
@@ -26,7 +26,7 @@ def create_book():
 
 
 #GET all
-@books_bp.get("")
+@bp.get("")
 def get_all_books():
     # select all books
     query = db.select(Book)
@@ -53,14 +53,14 @@ def get_all_books():
 
 
 # GET one
-@books_bp.get("/<book_id>")
+@bp.get("/<book_id>")
 def gets_one_book(book_id):
     book = validate_book(book_id)
     return book.to_dict()
 
 
 # UPDATE one
-@books_bp.put("/<book_id>")
+@bp.put("/<book_id>")
 def update_book(book_id):
     book = validate_book(book_id)
     request_body = request.get_json()
@@ -73,7 +73,7 @@ def update_book(book_id):
 
 
 # DELETE one
-@books_bp.delete("/<book_id>")
+@bp.delete("/<book_id>")
 def delete_book(book_id):
     book = validate_book(book_id)
     db.session.delete(book)
