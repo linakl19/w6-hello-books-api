@@ -55,3 +55,10 @@ def create_book_with_author(author_id):
     db.session.commit()
 
     return make_response(new_book.to_dict(), 201)
+
+
+@bp.get("/<author_id>/books")
+def get_books_by_author(author_id):
+    author = validate_model(Author, author_id)
+    response = [book.to_dict() for book in author.books]
+    return response
