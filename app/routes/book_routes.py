@@ -1,6 +1,7 @@
 from flask import Blueprint, Response, abort, make_response, request
 from app.models.book import Book
 from ..db import db
+from app.routes.route_utilities import validate_model
 
 
 bp = Blueprint("bp", __name__, url_prefix="/books")
@@ -55,14 +56,14 @@ def get_all_books():
 # GET one
 @bp.get("/<book_id>")
 def gets_one_book(book_id):
-    book = validate_book(book_id)
+    book = validate_model(Book, book_id)
     return book.to_dict()
 
 
 # UPDATE one
 @bp.put("/<book_id>")
 def update_book(book_id):
-    book = validate_book(book_id)
+    book = validate_model(Book, book_id)
     request_body = request.get_json()
 
     book.title = request_body["title"]
@@ -75,72 +76,10 @@ def update_book(book_id):
 # DELETE one
 @bp.delete("/<book_id>")
 def delete_book(book_id):
-    book = validate_book(book_id)
+    book = validate_model(Book, book_id)
     db.session.delete(book)
     db.session.commit()
 
     return Response(status=204, mimetype="application/json")
 
 
-# Helper function to validate book_id
-def validate_book(book_id):
-    try:
-        book_id = int(book_id)
-    except:
-        response = {"message": f"Book {book_id} invalid"}
-        abort(make_response(response, 400))
-
-    query = db.select(Book).where(Book.id == book_id)
-    book = db.session.scalar(query)
-
-    if not book:
-        response = {"message": f"Book {book_id} not found"}
-        abort(make_response(response, 404))
-    
-    return book
-
-
-
-# from flask import Blueprint, abort, make_response
-# from app.models.book import books
-
-# books_bp = Blueprint("books_bp", __name__, url_prefix="/books")
-
-# @books_bp.get("")
-# def get_all_books():
-#     books_response = []
-#     for book in books:
-#         books_response.append(
-#             {
-#                 "id":book.id,
-#                 "title": book.title,
-#                 "description": book.description
-#             }
-#         )
-#     return books_response
-
-# # Getting a single book endpoint
-# @books_bp.get("/<book_id>")
-# def gets_one_book(book_id):
-#     book = validate_book(book_id)
-
-#     return dict(
-#         id = book.id,
-#         title = book.title,
-#         description = book.description,
-#     )
-
-# # Helper function to validate book_id
-# def validate_book(book_id):
-#     try:
-#         book_id = int(book_id)
-#     except:
-#         response = {"message": f"Book with id:{book_id} is invalid"}
-#         abort(make_response(response, 400))
-
-#     for book in books:
-#         if book.id == book_id:
-#             return book
-        
-#     response = {"message": f"Book with id:{book_id} was not found"}
-#     abort(make_response(response, 404))
