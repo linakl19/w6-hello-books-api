@@ -4,7 +4,7 @@ from ..db import db
 from app.routes.route_utilities import validate_model, create_model
 
 
-bp = Blueprint("bp", __name__, url_prefix="/books")
+bp = Blueprint("book_bp", __name__, url_prefix="/books")
 
 
 # POST one
