@@ -11,7 +11,7 @@ def create_app(config=None):
     # 1. hide a warning about a feature in SQLAlchemy that we won't be using
     # 2. the connection string for our database
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:postgres@localhost:5432/hello_books_development'
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('SQLALCHEMY_DATABASE_URI')
 
     if config:
     # Merge `config` into the app's configuration
