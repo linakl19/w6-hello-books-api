@@ -1,7 +1,7 @@
 from flask import Blueprint, Response, abort, make_response, request
 from app.models.book import Book
 from ..db import db
-from app.routes.route_utilities import validate_model, create_model
+from app.routes.route_utilities import validate_model, create_model, get_models_with_filters
 
 
 bp = Blueprint("book_bp", __name__, url_prefix="/books")
@@ -15,32 +15,10 @@ def create_book():
     return create_model(Book, request_body)
 
 
-
 #GET all
 @bp.get("")
 def get_all_books():
-    # select all books
-    query = db.select(Book)
-
-	# select books with matching title
-    title_param = request.args.get("title")
-    if title_param:
-        query = query.where(Book.title.ilike(f"%{title_param}%"))
-    
-    # select books with matching description
-    description_param = request.args.get("description")
-    if description_param:
-        query = query.where(Book.description.ilike(f"%{description_param}%"))
-	
-    query = query.order_by(Book.id)
-    books = db.session.scalars(query)
-    #can also be written as:
-	# books = db.session.scalars(query.order_by(Book.id))
-
-    books_response = []
-    for book in books:
-        books_response.append(book.to_dict())
-    return books_response
+    return get_models_with_filters(Book, request.args)
 
 
 # GET one
