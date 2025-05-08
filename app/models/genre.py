@@ -14,10 +14,16 @@ class Genre(db.Model):
 
 
     def to_dict(self):
-        return {
+        genre_as_dict =  {
             "id": self.id,
             "name": self.name
         }
+
+        if self.books: 
+            genre_as_dict["books"] = [book.title for book in self.books]
+        
+        return genre_as_dict
+
     
     @classmethod
     def from_dict(cls, genre_data):
